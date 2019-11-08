@@ -22,6 +22,7 @@ set -e
 
 INSTALL_PACKAGES=
 REMOVE_PACKAGES=
+RUBY_VERSION=2.6
 
 if [ ! -z "$WITH_LIBDE265" ]; then
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
@@ -47,6 +48,11 @@ if [ ! -z "$WITH_GRAPHICS" ]; then
         libjpeg \
         libpng \
         "
+fi
+
+if [ ! -z "$REMOVE_PACKAGES" ] || [ ! -z "$INSTALL_PACKAGES" ]; then
+    echo "Updating Ruby to $RUBY_VERSION ..."
+    rvm use $RUBY_VERSION --install --binary
 fi
 
 if [ ! -z "$REMOVE_PACKAGES" ]; then
