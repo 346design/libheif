@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     strategy:
@@ -13,11 +16,12 @@ jobs:
         env:
           - { NAME: "nothing" }
           - { NAME: "libde265 (1) / x265 / aom / graphics", WITH_GRAPHICS: 1, WITH_X265: 1, WITH_AOM: 1, WITH_LIBDE265: 1 }
-          - { NAME: "libde265 (2) / x265 / aom / graphics", WITH_GRAPHICS: 1, WITH_X265: 1, WITH_AOM: 1, WITH_LIBDE265: 2 }
     env: ${{ matrix.env }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Install dependencies
       run: |
@@ -37,3 +41,34 @@ jobs:
         CXX: clang++
       run: |
         ./scripts/run-ci.sh
+
+  tidy:
+    env:
+      WITH_GRAPHICS: 1
+      WITH_X265: 1
+      WITH_AOM: 1
+      WITH_DAV1D: 1
+      WITH_LIBDE265: 1
+      CLANG_TIDY: 1
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Install dependencies
+      run: |
+        ./scripts/install-ci-linux.sh
+        sudo apt install clang-tidy-18
+
+    - name: Prepare CI
+      run: |
+        ./scripts/prepare-ci.sh
+
+    - name: Run tests
+      run: |
+        ./scripts/run-ci.sh
+
+    - name: Run clang-tidy
+      run: |
+        run-clang-tidy-18 -checks=-clang-diagnostic-tautological-compare,-clang-diagnostic-tautological-constant-out-of-range-compare -j$(nproc)

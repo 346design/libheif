@@ -1,21 +1,28 @@
 /*
  * GO interface to libheif
- * Copyright (c) 2018 struktur AG, Dirk Farin <farin@struktur.de>
  *
- * This file is part of heif, an example application using libheif.
+ * MIT License
  *
- * heif is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright (c) 2018 Dirk Farin <dirk.farin@gmail.com>
+ * Copyright (c) 2018 Joachim Bauch <bauch@struktur.de>
  *
- * heif is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU General Public License
- * along with heif.  If not, see <http://www.gnu.org/licenses/>.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package heif
@@ -42,21 +49,26 @@ func GetVersion() string {
 	return C.GoString(C.heif_get_version())
 }
 
-type Compression C.enum_heif_compression_format
+type Compression C.heif_compression_format
 
 const (
-	CompressionUndefined = C.heif_compression_undefined
-	CompressionHEVC      = C.heif_compression_HEVC
-	CompressionAV1       = C.heif_compression_AV1
-	CompressionAVC       = C.heif_compression_AVC
-	CompressionJPEG      = C.heif_compression_JPEG
+	CompressionUndefined    = C.heif_compression_undefined
+	CompressionHEVC         = C.heif_compression_HEVC
+	CompressionAV1          = C.heif_compression_AV1
+	CompressionAVC          = C.heif_compression_AVC
+	CompressionJPEG         = C.heif_compression_JPEG
+	CompressionJPEG2000     = C.heif_compression_JPEG2000
+	CompressionVVC          = C.heif_compression_VVC
+	CompressionEVC          = C.heif_compression_EVC
+	CompressionUncompressed = C.heif_compression_uncompressed
+	CompressionMask         = C.heif_compression_mask
+	CompressionHTJ2K        = C.heif_compression_HTJ2K
 )
 
-type Chroma C.enum_heif_chroma
+type Chroma C.heif_chroma
 
 const (
 	ChromaUndefined              = C.heif_chroma_undefined
-	ChromaMonochrome             = C.heif_chroma_monochrome
 	Chroma420                    = C.heif_chroma_420
 	Chroma422                    = C.heif_chroma_422
 	Chroma444                    = C.heif_chroma_444
@@ -66,21 +78,41 @@ const (
 	ChromaInterleavedRRGGBBAA_LE = C.heif_chroma_interleaved_RRGGBBAA_LE
 	ChromaInterleavedRRGGBB_BE   = C.heif_chroma_interleaved_RRGGBB_BE
 	ChromaInterleavedRRGGBB_LE   = C.heif_chroma_interleaved_RRGGBB_LE
+	ChromaPlanar                 = C.heif_chroma_planar
 
+	ChromaMonochrome       = C.heif_chroma_monochrome
 	ChromaInterleaved24Bit = C.heif_chroma_interleaved_24bit
 	ChromaInterleaved32Bit = C.heif_chroma_interleaved_32bit
 )
 
-type Colorspace C.enum_heif_colorspace
+type ChromaDownsamplingAlgorithm C.heif_chroma_downsampling_algorithm
 
 const (
-	ColorspaceUndefined  = C.heif_colorspace_undefined
-	ColorspaceYCbCr      = C.heif_colorspace_YCbCr
-	ColorspaceRGB        = C.heif_colorspace_RGB
-	ColorspaceMonochrome = C.heif_colorspace_monochrome
+	ChromaDownsamplingAverage         = C.heif_chroma_downsampling_average
+	ChromaDownsamplingNearestNeighbor = C.heif_chroma_downsampling_nearest_neighbor
+	ChromaDownsamplingSharpYUV        = C.heif_chroma_downsampling_sharp_yuv
 )
 
-type Channel C.enum_heif_channel
+type ChromaUpsamplingAlgorithm C.heif_chroma_upsampling_algorithm
+
+const (
+	ChromaUpsamplingNearestNeighbor = C.heif_chroma_upsampling_nearest_neighbor
+	ChromaUpsamplingBilinear        = C.heif_chroma_upsampling_bilinear
+)
+
+type Colorspace C.heif_colorspace
+
+const (
+	ColorspaceUndefined   = C.heif_colorspace_undefined
+	ColorspaceYCbCr       = C.heif_colorspace_YCbCr
+	ColorspaceRGB         = C.heif_colorspace_RGB
+	ColorspaceCustom      = C.heif_colorspace_custom
+	ColorspaceMonochrome  = C.heif_colorspace_monochrome
+	ColorspaceFilterArray = C.heif_colorspace_filter_array
+	ColorspaceNonvisual   = C.heif_colorspace_nonvisual
+)
+
+type Channel C.heif_channel
 
 const (
 	ChannelY           = C.heif_channel_Y
@@ -91,9 +123,13 @@ const (
 	ChannelB           = C.heif_channel_B
 	ChannelAlpha       = C.heif_channel_Alpha
 	ChannelInterleaved = C.heif_channel_interleaved
+	ChannelFilterArray = C.heif_channel_filter_array
+	ChannelDepth       = C.heif_channel_depth
+	ChannelDisparity   = C.heif_channel_disparity
+	ChannelUnknown     = C.heif_channel_unknown
 )
 
-type ProgressStep C.enum_heif_progress_step
+type ProgressStep C.heif_progress_step
 
 const (
 	ProgressStepTotal    = C.heif_progress_step_total
@@ -118,7 +154,7 @@ const (
 
 // --- HeifError
 
-type ErrorCode C.enum_heif_error_code
+type ErrorCode C.heif_error_code
 
 const (
 	ErrorOK = C.heif_error_Ok
@@ -150,11 +186,17 @@ const (
 	// Error during encoding or when writing to the output
 	ErrorEncoding = C.heif_error_Encoding_error
 
+	ErrorEndOfSequence = C.heif_error_End_of_sequence
+
 	// Application has asked for a color profile type that does not exist
 	ErrorColorProfileDoesNotExist = C.heif_error_Color_profile_does_not_exist
+
+	ErrorPluginLoadingError = C.heif_error_Plugin_loading_error
+
+	ErrorCanceled = C.heif_error_Canceled
 )
 
-type ErrorSubcode C.enum_heif_suberror_code
+type ErrorSubcode C.heif_suberror_code
 
 const (
 	// no further information available
@@ -174,6 +216,8 @@ const (
 	SuberrorNoIdatBox = C.heif_suberror_No_idat_box
 
 	SuberrorNoMetaBox = C.heif_suberror_No_meta_box
+
+	SuberrorNoMoovBox = C.heif_suberror_No_moov_box
 
 	SuberrorNoHdlrBox = C.heif_suberror_No_hdlr_box
 
@@ -210,7 +254,12 @@ const (
 	// Tile-images in a grid image are missing
 	SuberrorMissingGridImages = C.heif_suberror_Missing_grid_images
 
+	// The colr (NCLX) box and the codec bitstream VUI/color signalling disagree.
+	SuberrorNCLXColrVUIMismatch = C.heif_suberror_NCLX_colr_VUI_mismatch
+
 	SuberrorNoAV1CBox = C.heif_suberror_No_av1C_box
+
+	SuberrorNoAVCCBox = C.heif_suberror_No_avcC_box
 
 	SuberrorInvalidCleanAperture = C.heif_suberror_Invalid_clean_aperture
 
@@ -220,7 +269,15 @@ const (
 	// Overlay image completely outside of visible canvas area
 	SuberrorOverlayImageOutsideOfCanvas = C.heif_suberror_Overlay_image_outside_of_canvas
 
+	SuberrorPluginIsNotLoaded = C.heif_suberror_Plugin_is_not_loaded
+
+	SuberrorPluginLoadingError = C.heif_suberror_Plugin_loading_error
+
 	SuberrorAuxiliaryImageTypeUnspecified = C.heif_suberror_Auxiliary_image_type_unspecified
+
+	SuberrorCannotReadPluginDirectory = C.heif_suberror_Cannot_read_plugin_directory
+
+	SuberrorNoMatchingDecoderInstalled = C.heif_suberror_No_matching_decoder_installed
 
 	SuberrorNoOrInvalidPrimaryItem = C.heif_suberror_No_or_invalid_primary_item
 
@@ -234,12 +291,20 @@ const (
 
 	SuberrorInvalidImageSize = C.heif_suberror_Invalid_image_size
 
+	SuberrorCameraIntrinsicMatrixUndefined = C.heif_suberror_Camera_intrinsic_matrix_undefined
+
+	SuberrorCameraExtrinsicMatrixUndefined = C.heif_suberror_Camera_extrinsic_matrix_undefined
+
+	SuberrorDecompressionInvalidData = C.heif_suberror_Decompression_invalid_data
+
 	// --- Memory_allocation_error ---
 
 	// A security limit preventing unreasonable memory allocations was exceeded by the input file.
 	// Please check whether the file is valid. If it is, contact us so that we could increase the
 	// security limits further.
 	SuberrorSecurityLimitExceeded = C.heif_suberror_Security_limit_exceeded
+
+	CompressionInitialisationError = C.heif_suberror_Compression_initialisation_error
 
 	// --- Usage_error ---
 
@@ -264,9 +329,31 @@ const (
 	// The value for the given parameter is not in the valid range.
 	SuberrorInvalidParameterValue = C.heif_suberror_Invalid_parameter_value
 
+	SuberrorInvalidProperty = C.heif_suberror_Invalid_property
+
+	SuberrorItemReferenceCycle = C.heif_suberror_Item_reference_cycle
+
 	SuberrorInvalidPixiBox = C.heif_suberror_Invalid_pixi_box
 
+	SuberrorInvalidRegionData = C.heif_suberror_Invalid_region_data
+
+	SuberrorNoIspeProperty = C.heif_suberror_No_ispe_property
+
 	SuberrorWrongTileImagePixelDepth = C.heif_suberror_Wrong_tile_image_pixel_depth
+
+	SuberrorUnknownNCLXColorPrimaries = C.heif_suberror_Unknown_NCLX_color_primaries
+
+	SuberrorUnknownNCLXTransferCharacteristics = C.heif_suberror_Unknown_NCLX_transfer_characteristics
+
+	SuberrorUnknownNCLXMatrixCoefficients = C.heif_suberror_Unknown_NCLX_matrix_coefficients
+
+	SuberrorInvalidJ2KCodestream = C.heif_suberror_Invalid_J2K_codestream
+
+	SuberrorNoVcCBox = C.heif_suberror_No_vvcC_box
+
+	SuberrorNoIcbrBox = C.heif_suberror_No_icbr_box
+
+	SuberrorInvalidMiniBox = C.heif_suberror_Invalid_mini_box
 
 	// --- Unsupported_feature ---
 
@@ -278,10 +365,18 @@ const (
 
 	SuberrorUnsupportedDataVersion = C.heif_suberror_Unsupported_data_version
 
+	SuberrorUnsupportedGenericCompressionMethod = C.heif_suberror_Unsupported_generic_compression_method
+
+	SuberrorUnsupportedEssentialProperty = C.heif_suberror_Unsupported_essential_property
+
 	// The conversion of the source image to the requested chroma / colorspace is not supported.
 	SuberrorUnsupportedColorConversion = C.heif_suberror_Unsupported_color_conversion
 
 	SuberrorUnsupportedItemConstructionMethod = C.heif_suberror_Unsupported_item_construction_method
+
+	SuberrorUnsupportedHeaderCompressionMethod = C.heif_suberror_Unsupported_header_compression_method
+
+	SubErrorUnsupportedTrackType = C.heif_suberror_Unsupported_track_type
 
 	// --- Encoder_plugin_error ---
 
@@ -290,6 +385,14 @@ const (
 	// --- Encoding_error ---
 
 	SuberrorCannotWriteOutputData = C.heif_suberror_Cannot_write_output_data
+
+	SuberrorEncoderInitialization = C.heif_suberror_Encoder_initialization
+
+	SuberrorEncoderEncoding = C.heif_suberror_Encoder_encoding
+
+	SuberrorEncoderCleanup = C.heif_suberror_Encoder_cleanup
+
+	SuberrorTooManyRegions = C.heif_suberror_Too_many_regions
 )
 
 type HeifError struct {
@@ -350,14 +453,14 @@ func (c *Context) ReadFromFile(filename string) error {
 	defer C.free(unsafe.Pointer(c_filename))
 
 	err := C.heif_context_read_from_file(c.context, c_filename, nil)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return convertHeifError(err)
 }
 
 func (c *Context) ReadFromMemory(data []byte) error {
 	// TODO: Use reader API internally.
 	err := C.heif_context_read_from_memory(c.context, unsafe.Pointer(&data[0]), C.size_t(len(data)), nil)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return convertHeifError(err)
 }
 
@@ -377,19 +480,19 @@ func (e *Encoder) Name() string {
 
 func (e *Encoder) SetQuality(q int) error {
 	err := C.heif_encoder_set_lossy_quality(e.encoder, C.int(q))
-	keepAlive(e)
+	runtime.KeepAlive(e)
 	return convertHeifError(err)
 }
 
 func (e *Encoder) SetLossless(l LosslessMode) error {
 	err := C.heif_encoder_set_lossless(e.encoder, C.int(l))
-	keepAlive(e)
+	runtime.KeepAlive(e)
 	return convertHeifError(err)
 }
 
 func (e *Encoder) SetLoggingLevel(l LoggingLevel) error {
 	err := C.heif_encoder_set_logging_level(e.encoder, C.int(l))
-	keepAlive(e)
+	runtime.KeepAlive(e)
 	return convertHeifError(err)
 }
 
@@ -406,7 +509,7 @@ func (c *Context) convertEncoderDescriptor(d *C.struct_heif_encoder_descriptor) 
 		name: C.GoString(cname),
 	}
 	err := C.heif_context_get_encoder(c.context, d, &enc.encoder)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -417,8 +520,8 @@ func (c *Context) convertEncoderDescriptor(d *C.struct_heif_encoder_descriptor) 
 func (c *Context) NewEncoder(compression Compression) (*Encoder, error) {
 	const max = 1
 	descriptors := make([]*C.struct_heif_encoder_descriptor, max)
-	num := int(C.heif_context_get_encoder_descriptors(c.context, uint32(compression), nil, &descriptors[0], C.int(max)))
-	keepAlive(c)
+	num := int(C.heif_context_get_encoder_descriptors(c.context, C.heif_compression_format(compression), nil, &descriptors[0], C.int(max)))
+	runtime.KeepAlive(c)
 	if num == 0 {
 		return nil, fmt.Errorf("no encoder for compression %v", compression)
 	}
@@ -427,39 +530,39 @@ func (c *Context) NewEncoder(compression Compression) (*Encoder, error) {
 
 func (c *Context) WriteToFile(filename string) error {
 	err := C.heif_context_write_to_file(c.context, C.CString(filename))
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return convertHeifError(err)
 }
 
 func (c *Context) GetNumberOfTopLevelImages() int {
 	i := int(C.heif_context_get_number_of_top_level_images(c.context))
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return i
 }
 
 func (c *Context) IsTopLevelImageID(ID int) bool {
 	ok := C.heif_context_is_top_level_image_ID(c.context, C.heif_item_id(ID)) != 0
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return ok
 }
 
 func (c *Context) GetListOfTopLevelImageIDs() []int {
 	num := int(C.heif_context_get_number_of_top_level_images(c.context))
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	if num == 0 {
 		return []int{}
 	}
 
 	origIDs := make([]C.heif_item_id, num)
 	C.heif_context_get_list_of_top_level_image_IDs(c.context, &origIDs[0], C.int(num))
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	return convertItemIDs(origIDs, num)
 }
 
 func (c *Context) GetPrimaryImageID() (int, error) {
 	var id C.heif_item_id
 	err := C.heif_context_get_primary_image_ID(c.context, &id)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	if err := convertHeifError(err); err != nil {
 		return 0, err
 	}
@@ -480,7 +583,7 @@ func freeHeifImageHandle(c *ImageHandle) {
 func (c *Context) GetPrimaryImageHandle() (*ImageHandle, error) {
 	var handle ImageHandle
 	err := C.heif_context_get_primary_image_handle(c.context, &handle.handle)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -491,7 +594,7 @@ func (c *Context) GetPrimaryImageHandle() (*ImageHandle, error) {
 func (c *Context) GetImageHandle(id int) (*ImageHandle, error) {
 	var handle ImageHandle
 	err := C.heif_context_get_image_handle(c.context, C.heif_item_id(id), &handle.handle)
-	keepAlive(c)
+	runtime.KeepAlive(c)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -501,57 +604,57 @@ func (c *Context) GetImageHandle(id int) (*ImageHandle, error) {
 
 func (h *ImageHandle) IsPrimaryImage() bool {
 	ok := C.heif_image_handle_is_primary_image(h.handle) != 0
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return ok
 }
 
 func (h *ImageHandle) GetWidth() int {
 	i := int(C.heif_image_handle_get_width(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return i
 }
 
 func (h *ImageHandle) GetHeight() int {
 	i := int(C.heif_image_handle_get_height(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return i
 }
 
 func (h *ImageHandle) HasAlphaChannel() bool {
 	ok := C.heif_image_handle_has_alpha_channel(h.handle) != 0
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return ok
 }
 
 func (h *ImageHandle) HasDepthImage() bool {
 	ok := C.heif_image_handle_has_depth_image(h.handle) != 0
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return ok
 }
 
 func (h *ImageHandle) GetNumberOfDepthImages() int {
 	i := int(C.heif_image_handle_get_number_of_depth_images(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return i
 }
 
 func (h *ImageHandle) GetListOfDepthImageIDs() []int {
 	num := int(C.heif_image_handle_get_number_of_depth_images(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	if num == 0 {
 		return []int{}
 	}
 
 	origIDs := make([]C.heif_item_id, num)
 	C.heif_image_handle_get_list_of_depth_image_IDs(h.handle, &origIDs[0], C.int(num))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return convertItemIDs(origIDs, num)
 }
 
 func (h *ImageHandle) GetDepthImageHandle(depth_image_id int) (*ImageHandle, error) {
 	var handle ImageHandle
 	err := C.heif_image_handle_get_depth_image_handle(h.handle, C.heif_item_id(depth_image_id), &handle.handle)
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -562,27 +665,27 @@ func (h *ImageHandle) GetDepthImageHandle(depth_image_id int) (*ImageHandle, err
 
 func (h *ImageHandle) GetNumberOfThumbnails() int {
 	i := int(C.heif_image_handle_get_number_of_thumbnails(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return i
 }
 
 func (h *ImageHandle) GetListOfThumbnailIDs() []int {
 	num := int(C.heif_image_handle_get_number_of_thumbnails(h.handle))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	if num == 0 {
 		return []int{}
 	}
 
 	origIDs := make([]C.heif_item_id, num)
 	C.heif_image_handle_get_list_of_thumbnail_IDs(h.handle, &origIDs[0], C.int(num))
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	return convertItemIDs(origIDs, num)
 }
 
 func (h *ImageHandle) GetThumbnail(thumbnail_id int) (*ImageHandle, error) {
 	var handle ImageHandle
 	err := C.heif_image_handle_get_thumbnail(h.handle, C.heif_item_id(thumbnail_id), &handle.handle)
-	keepAlive(h)
+	runtime.KeepAlive(h)
 	runtime.SetFinalizer(&handle, freeHeifImageHandle)
 	return &handle, convertHeifError(err)
 }
@@ -618,7 +721,7 @@ type Image struct {
 
 func NewImage(width, height int, colorspace Colorspace, chroma Chroma) (*Image, error) {
 	var image Image
-	err := C.heif_image_create(C.int(width), C.int(height), uint32(colorspace), uint32(chroma), &image.image)
+	err := C.heif_image_create(C.int(width), C.int(height), C.heif_colorspace(colorspace), C.heif_chroma(chroma), &image.image)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -639,8 +742,8 @@ func (h *ImageHandle) DecodeImage(colorspace Colorspace, chroma Chroma, options 
 		opt = options.options
 	}
 
-	err := C.heif_decode_image(h.handle, &image.image, uint32(colorspace), uint32(chroma), opt)
-	keepAlive(h)
+	err := C.heif_decode_image(h.handle, &image.image, C.heif_colorspace(colorspace), C.heif_chroma(chroma), opt)
+	runtime.KeepAlive(h)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -651,37 +754,37 @@ func (h *ImageHandle) DecodeImage(colorspace Colorspace, chroma Chroma, options 
 
 func (img *Image) GetColorspace() Colorspace {
 	cs := Colorspace(C.heif_image_get_colorspace(img.image))
-	keepAlive(img)
+	runtime.KeepAlive(img)
 	return cs
 }
 
 func (img *Image) GetChromaFormat() Chroma {
 	c := Chroma(C.heif_image_get_chroma_format(img.image))
-	keepAlive(img)
+	runtime.KeepAlive(img)
 	return c
 }
 
 func (img *Image) GetWidth(channel Channel) int {
-	i := int(C.heif_image_get_width(img.image, uint32(channel)))
-	keepAlive(img)
+	i := int(C.heif_image_get_width(img.image, C.heif_channel(channel)))
+	runtime.KeepAlive(img)
 	return i
 }
 
 func (img *Image) GetHeight(channel Channel) int {
-	i := int(C.heif_image_get_height(img.image, uint32(channel)))
-	keepAlive(img)
+	i := int(C.heif_image_get_height(img.image, C.heif_channel(channel)))
+	runtime.KeepAlive(img)
 	return i
 }
 
 func (img *Image) GetBitsPerPixel(channel Channel) int {
-	i := int(C.heif_image_get_bits_per_pixel(img.image, uint32(channel)))
-	keepAlive(img)
+	i := int(C.heif_image_get_bits_per_pixel(img.image, C.heif_channel(channel)))
+	runtime.KeepAlive(img)
 	return i
 }
 
 func (img *Image) GetBitsPerPixelRange(channel Channel) int {
-	i := int(C.heif_image_get_bits_per_pixel_range(img.image, uint32(channel)))
-	keepAlive(img)
+	i := int(C.heif_image_get_bits_per_pixel_range(img.image, C.heif_channel(channel)))
+	runtime.KeepAlive(img)
 	return i
 }
 
@@ -1067,24 +1170,37 @@ func (i *ImageAccess) setData(data []byte, stride int) {
 	i.Plane = C.GoBytes(i.planePtr, C.int(i.height*i.Stride))
 }
 
+// C.GoBytes takes a C.int length, so it can copy at most this many bytes.
+const maxGoBytesLen = int64(^uint32(0) >> 1) // math.MaxInt32
+
 func (img *Image) GetPlane(channel Channel) (*ImageAccess, error) {
-	height := C.heif_image_get_height(img.image, uint32(channel))
-	keepAlive(img)
+	height := C.heif_image_get_height(img.image, C.heif_channel(channel))
+	runtime.KeepAlive(img)
 	if height == -1 {
 		return nil, fmt.Errorf("No such channel %v", channel)
 	}
 
-	var stride C.int
-	plane := C.heif_image_get_plane(img.image, uint32(channel), &stride)
-	keepAlive(img)
+	// Use the size_t-stride variant. The deprecated heif_image_get_plane() returns
+	// an int stride; multiplying that by the height overflows int32 for large
+	// multi-byte images, which then makes C.GoBytes() panic on a negative length.
+	var stride C.size_t
+	plane := C.heif_image_get_plane2(img.image, C.heif_channel(channel), &stride)
+	runtime.KeepAlive(img)
 	if plane == nil {
 		return nil, fmt.Errorf("No such channel %v", channel)
 	}
 
 	ptr := unsafe.Pointer(plane)
-	size := stride * height
+
+	// Compute the plane size in 64-bit arithmetic and reject planes larger than
+	// C.GoBytes() can represent instead of overflowing into a negative length.
+	size := int64(stride) * int64(height)
+	if size < 0 || size > maxGoBytesLen {
+		return nil, fmt.Errorf("Image plane too large: %d bytes", size)
+	}
+
 	access := &ImageAccess{
-		Plane:    C.GoBytes(ptr, size),
+		Plane:    C.GoBytes(ptr, C.int(size)),
 		planePtr: ptr,
 		Stride:   int(stride),
 		height:   int(height),
@@ -1094,8 +1210,8 @@ func (img *Image) GetPlane(channel Channel) (*ImageAccess, error) {
 }
 
 func (img *Image) NewPlane(channel Channel, width, height, depth int) (*ImageAccess, error) {
-	err := C.heif_image_add_plane(img.image, uint32(channel), C.int(width), C.int(height), C.int(depth))
-	keepAlive(img)
+	err := C.heif_image_add_plane(img.image, C.heif_channel(channel), C.int(width), C.int(height), C.int(depth))
+	runtime.KeepAlive(img)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -1105,7 +1221,7 @@ func (img *Image) NewPlane(channel Channel, width, height, depth int) (*ImageAcc
 func (img *Image) ScaleImage(width int, height int) (*Image, error) {
 	var scaled_image Image
 	err := C.heif_image_scale_image(img.image, &scaled_image.image, C.int(width), C.int(height), nil)
-	keepAlive(img)
+	runtime.KeepAlive(img)
 	if err := convertHeifError(err); err != nil {
 		return nil, err
 	}
@@ -1239,6 +1355,10 @@ func imageFromYCbCr(i *image.YCbCr) (*Image, error) {
 	switch sr := i.SubsampleRatio; sr {
 	case image.YCbCrSubsampleRatio420:
 		cm = Chroma420
+	case image.YCbCrSubsampleRatio422:
+		cm = Chroma422
+	case image.YCbCrSubsampleRatio444:
+		cm = Chroma444
 	default:
 		return nil, fmt.Errorf("unsupported subsample ratio: %s", sr.String())
 	}
@@ -1256,13 +1376,23 @@ func imageFromYCbCr(i *image.YCbCr) (*Image, error) {
 	pY.setData([]byte(i.Y), i.YStride)
 
 	// TODO: Might need to be updated for other SubsampleRatio values.
-	halfW, halfH := (w+1)/2, (h+1)/2
-	pCb, err := out.NewPlane(ChannelCb, halfW, halfH, depth)
+	var cw, ch int
+	switch cm {
+	case Chroma420:
+		cw, ch = (w+1)/2, (h+1)/2
+	case Chroma444:
+		cw, ch = w, h
+	case Chroma422:
+		cw, ch = (w+1)/2, h
+	default:
+		return nil, fmt.Errorf("cm not support: %v", cm)
+	}
+	pCb, err := out.NewPlane(ChannelCb, cw, ch, depth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to add Cb plane: %v", err)
 	}
 	pCb.setData([]byte(i.Cb), i.CStride)
-	pCr, err := out.NewPlane(ChannelCr, halfW, halfH, depth)
+	pCr, err := out.NewPlane(ChannelCr, cw, ch, depth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to add Cr plane: %v", err)
 	}
@@ -1330,10 +1460,10 @@ func EncodeFromImage(img image.Image, compression Compression, quality int, loss
 
 	var handle ImageHandle
 	err2 := C.heif_context_encode_image(ctx.context, out.image, enc.encoder, encOpts.options, &handle.handle)
-	keepAlive(ctx)
-	keepAlive(out)
-	keepAlive(enc)
-	keepAlive(encOpts)
+	runtime.KeepAlive(ctx)
+	runtime.KeepAlive(out)
+	runtime.KeepAlive(enc)
+	runtime.KeepAlive(encOpts)
 	if err := convertHeifError(err2); err != nil {
 		return nil, fmt.Errorf("failed to encode image: %v", err)
 	}

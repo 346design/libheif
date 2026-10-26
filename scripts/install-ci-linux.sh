@@ -22,20 +22,16 @@ set -e
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
-INSTALL_PACKAGES=
+INSTALL_PACKAGES="gdb "
 REMOVE_PACKAGES=
 BUILD_ROOT=$ROOT/..
 UPDATE_APT=
-ADD_LIBHEIF_PPA=
 CURRENT_BRANCH=$TRAVIS_BRANCH
 if [ -z "$CURRENT_BRANCH" ]; then
     CURRENT_BRANCH=${GITHUB_REF##*/}
 fi
 
-if [ "$WITH_LIBDE265" = "1" ]; then
-    echo "Adding PPA strukturag/libde265 ..."
-    sudo add-apt-repository -y ppa:strukturag/libde265
-    UPDATE_APT=1
+if [ "$WITH_LIBDE265" = "1" ] || [ "$WITH_LIBDE265" = "3" ]; then
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
         libde265-dev \
         "
@@ -55,17 +51,17 @@ if [ "$WITH_LIBDE265" = "2" ]; then
         --disable-acceleration_speed
     make -j $(nproc) && make -j $(nproc) install
     popd
+
+    ls -lR $BUILD_ROOT/libde265/dist
 fi
 
 if [ "$WITH_AOM" = "1" ]; then
-    ADD_LIBHEIF_PPA=1
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
         libaom-dev \
         "
 fi
 
 if [ "$WITH_X265" = "1" ]; then
-    ADD_LIBHEIF_PPA=1
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
         libx265-dev \
         "
@@ -73,11 +69,9 @@ fi
 
 if [ "$WITH_DAV1D" = "1" ]; then
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
+        meson \
         nasm \
         ninja-build \
-        python3-pip \
-        python3-setuptools \
-        python3-wheel \
         "
 fi
 
@@ -105,34 +99,40 @@ if [ ! -z "$WITH_GRAPHICS" ]; then
         libgdk-pixbuf2.0-dev \
         libjpeg-dev \
         libpng-dev \
+        libtiff-dev \
+        "
+fi
+
+if [ ! -z "$WITH_UNCOMPRESSED_CODEC" ]; then
+    INSTALL_PACKAGES="$INSTALL_PACKAGES \
+        libbrotli-dev \
+        zlib-dev \
         "
 fi
 
 if [ "$MINGW" == "32" ]; then
     sudo dpkg --add-architecture i386
+    sudo apt-get update
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
         binutils-mingw-w64-i686 \
         g++-mingw-w64-i686 \
         gcc-mingw-w64-i686 \
         mingw-w64-i686-dev \
+        libz-mingw-w64-dev \
+        libz-mingw-w64 \
         wine-stable \
         wine32 \
         "
-    UPDATE_APT=1
 elif [ "$MINGW" == "64" ]; then
     INSTALL_PACKAGES="$INSTALL_PACKAGES \
         binutils-mingw-w64-x86-64 \
         g++-mingw-w64-x86-64 \
         gcc-mingw-w64-x86-64 \
         mingw-w64-x86-64-dev \
+        libz-mingw-w64-dev \
+        libz-mingw-w64 \
         wine-stable \
         "
-fi
-
-if [ ! -z "$ADD_LIBHEIF_PPA" ]; then
-    echo "Adding PPA strukturag/libheif ..."
-    sudo add-apt-repository -y ppa:strukturag/libheif
-    UPDATE_APT=1
 fi
 
 if [ ! -z "$INSTALL_PACKAGES" ]; then
@@ -181,19 +181,16 @@ elif [ "$MINGW" == "64" ]; then
 fi
 
 if [ "$WITH_DAV1D" = "1" ]; then
-    pip3 install --user meson
-
-    export PATH="$PATH:$HOME/.local/bin"
     cd third-party
-    sh dav1d.cmd -Denable_avx512=false
+    sh -e dav1d.cmd # dav1d does not support this option anymore: -Denable_avx512=false
     cd ..
 fi
 
 if [ "$WITH_RAV1E" = "1" ]; then
-    cargo install --force cargo-c
+    cargo install --force cargo-c@0.9.14+cargo-0.66
 
     export PATH="$PATH:$HOME/.cargo/bin"
     cd third-party
-    sh rav1e.cmd
+    sh -e rav1e.cmd
     cd ..
 fi
